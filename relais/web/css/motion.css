@@ -1,0 +1,17 @@
+/* Le mouvement a un rôle : un voyant qui clignote = ça charge ; une traduction qui se
+   dévoile = elle vient d'être validée ; une ligne qui monte = quelque chose est arrivé. */
+@keyframes blink { 50% { opacity: 0.25; } }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes breathe { 50% { box-shadow: 0 0 0 6px var(--lamp-glow); } }
+
+.utt[data-state="live"] .stamp .lamp.on { animation: breathe 1.4s ease-in-out infinite; }
+
+:root[data-motion="off"] *, :root[data-motion="off"] *::before, :root[data-motion="off"] *::after {
+  animation: none !important; transition: none !important; scroll-behavior: auto !important;
+}
+:root[data-motion="calm"] .utt[data-state="final"] .heard .line.wipe, :root[data-motion="calm"] .utt.enter { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  :root[data-motion="full"] .utt[data-state="final"] .heard .line.wipe { animation: none; }
+  :root[data-motion="full"] .folio { scroll-behavior: auto; }
+}

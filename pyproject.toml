@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "relais"
+version = "0.1.0"
+description = "Traducteur vocal bilingue local EN <-> FR : traduction, reconnaissance et synthèse vocales, conversation en direct."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+server  = ["starlette>=0.37", "uvicorn[standard]>=0.29"]
+mt      = ["ctranslate2>=4.4", "sentencepiece>=0.2"]
+stt     = ["faster-whisper>=1.1"]
+tts     = ["piper-tts>=1.3"]
+kokoro  = ["kokoro-onnx>=0.4"]
+convert = ["transformers>=4.40", "torch"]
+all     = ["relais[server,mt,stt,tts]"]
+dev     = ["pytest"]
+
+[project.scripts]
+relais = "relais.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["relais*"]
+
+[tool.setuptools.package-data]
+relais = ["data/*.json", "web/*.html", "web/css/*", "web/js/**/*", "web/i18n/*", "web/assets/*", "web/fonts/*"]

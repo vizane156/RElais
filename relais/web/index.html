@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr" data-theme="auto" data-layout="auto" data-density="comfortable" data-motion="full">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Relais</title>
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/fonts.css">
+<link rel="stylesheet" href="/css/tokens.css">
+<link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/css/layout.css">
+<link rel="stylesheet" href="/css/components.css">
+<link rel="stylesheet" href="/css/folio.css">
+<link rel="stylesheet" href="/css/motion.css">
+<script type="module" src="/js/app.js"></script>
+</head>
+<body>
+<a class="skip" href="#folio" data-i18n="a11y.skip">Aller à la conversation</a>
+
+<div class="app" id="app">
+  <header class="bar">
+    <div class="brand">
+      <svg class="ic mark" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/icons.svg#i-mark"/></svg>
+      <span class="brand-name">Relais</span>
+      <span class="badge-demo" id="demoBadge" hidden data-i18n="demo.badge" data-i18n-title="demo.hint">Démo</span>
+    </div>
+
+    <div class="pair" role="group">
+      <span class="lang-tag" id="tagLeft" data-side="a"></span>
+      <button class="icon-btn" id="swap" type="button" data-i18n-aria="pair.swap" data-i18n-title="pair.swap">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/icons.svg#i-swap"/></svg>
+      </button>
+      <span class="lang-tag" id="tagRight" data-side="b"></span>
+    </div>
+
+    <div class="bar-end">
+      <span class="conn" id="conn" data-state="connecting" role="status">
+        <span class="dot" aria-hidden="true"></span><span class="conn-text" id="connText"></span>
+      </span>
+      <button class="icon-btn" type="button" data-sheet="library" data-i18n-aria="top.library" data-i18n-title="top.library">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/icons.svg#i-wave"/></svg>
+      </button>
+      <button class="icon-btn" type="button" data-sheet="history" data-i18n-aria="top.history" data-i18n-title="top.history">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/icons.svg#i-clock"/></svg>
+      </button>
+      <button class="icon-btn" type="button" data-sheet="glossary" data-i18n-aria="top.glossary" data-i18n-title="top.glossary">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/icons.svg#i-book"/></svg>
+      </button>
+      <button class="icon-btn" type="button" data-sheet="settings" data-i18n-aria="top.settings" data-i18n-title="top.settings">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/icons.svg#i-settings"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="desk" data-i18n-aria="desk">
+      <section>
+        <h2 data-i18n="desk">Pupitre</h2>
+        <ul class="keys" id="keys"></ul>
+      </section>
+      <section>
+        <h2 data-i18n="who.title">Qui parle</h2>
+        <div class="seg" id="who" role="radiogroup" data-i18n-aria="who.title"></div>
+      </section>
+      <section class="meter">
+        <h2 data-i18n="level.title">Niveau du micro</h2>
+        <canvas id="meter" role="img" data-i18n-aria="level.title"></canvas>
+        <p class="meter-state" id="meterState"></p>
+      </section>
+      <section id="latBox">
+        <h2 data-i18n="lat.title">Délais</h2>
+        <dl class="lat" id="lat"></dl>
+      </section>
+    </aside>
+
+    <main class="page">
+      <div class="folio-head" id="folioHead" data-left="a">
+        <div class="col-title" id="titleA" data-side="a"></div>
+        <div class="col-title" id="titleB" data-side="b"></div>
+      </div>
+
+      <div class="folio" id="folio" data-left="a" role="log" aria-live="polite" tabindex="0"></div>
+
+      <form class="compose" id="compose" autocomplete="off">
+        <div class="compose-bar">
+          <span class="group">
+            <span data-i18n="compose.type_in">Je tape en</span>
+            <button class="chip" type="button" id="typeLang"><span class="swatch"></span><span class="chip-text"></span></button>
+          </span>
+          <span class="group">
+            <span data-i18n="compose.say_in">Voix en</span>
+            <button class="chip" type="button" id="sayLang"><span class="swatch"></span><span class="chip-text"></span></button>
+          </span>
+          <button class="icon-btn sm" type="button" id="stopVoice" hidden data-i18n-aria="library.stop" data-i18n-title="library.stop">
+            <svg class="ic sm" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/icons.svg#i-stop"/></svg>
+          </button>
+          <span class="spoken" id="said" aria-live="polite"></span>
+        </div>
+        <div class="compose-field">
+          <textarea class="input" id="input" rows="1" maxlength="2000" spellcheck="true" data-i18n-ph="compose.placeholder" data-i18n-aria="compose.placeholder"></textarea>
+          <button class="btn primary" type="submit" id="send" disabled>
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/icons.svg#i-return"/></svg>
+            <span data-i18n="compose.send">Envoyer</span>
+          </button>
+        </div>
+        <p class="preview" id="preview" data-side="a" aria-live="polite"></p>
+      </form>
+    </main>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet-head">
+    <h2 id="sheetTitle"></h2>
+    <button class="icon-btn" type="button" id="sheetClose" data-i18n-aria="sheet.close" data-i18n-title="sheet.close">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/icons.svg#i-x"/></svg>
+    </button>
+  </div>
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <div class="sheet-body" id="sheetBody"></div>
+</aside>
+<div class="toasts" id="toasts"></div>
+</body>
+</html>

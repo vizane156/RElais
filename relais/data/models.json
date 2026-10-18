@@ -1,0 +1,43 @@
+{
+  "fonts": [
+    {"name": "atkinson-hyperlegible-next-latin-wght-normal.woff2", "url": "https://cdn.jsdelivr.net/fontsource/fonts/atkinson-hyperlegible-next:vf@latest/latin-wght-normal.woff2"},
+    {"name": "atkinson-hyperlegible-next-latin-wght-italic.woff2", "url": "https://cdn.jsdelivr.net/fontsource/fonts/atkinson-hyperlegible-next:vf@latest/latin-wght-italic.woff2"},
+    {"name": "literata-latin-400-normal.woff2", "url": "https://cdn.jsdelivr.net/fontsource/fonts/literata@latest/latin-400-normal.woff2"},
+    {"name": "literata-latin-400-italic.woff2", "url": "https://cdn.jsdelivr.net/fontsource/fonts/literata@latest/latin-400-italic.woff2"},
+    {"name": "literata-latin-600-normal.woff2", "url": "https://cdn.jsdelivr.net/fontsource/fonts/literata@latest/latin-600-normal.woff2"}
+  ],
+  "mt": {
+    "en-fr": {"source": "Helsinki-NLP/opus-mt-en-fr", "dir": "mt/opus-mt-en-fr-int8", "approx_mb": 80, "license": "CC-BY-4.0"},
+    "fr-en": {"source": "Helsinki-NLP/opus-mt-fr-en", "dir": "mt/opus-mt-fr-en-int8", "approx_mb": 80, "license": "CC-BY-4.0"}
+  },
+  "stt": {
+    "tiny":  {"repo": "tiny",  "dir": "stt/whisper-tiny",  "approx_mb": 75,  "license": "MIT"},
+    "base":  {"repo": "base",  "dir": "stt/whisper-base",  "approx_mb": 145, "license": "MIT"},
+    "small": {"repo": "small", "dir": "stt/whisper-small", "approx_mb": 480, "license": "MIT"}
+  },
+  "tts": {
+    "piper": {
+      "base_url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/",
+      "voices": {
+        "en_US-lessac-medium": {"lang": "en", "label": "Lessac (US)",  "path": "en/en_US/lessac/medium", "approx_mb": 63, "default": true},
+        "en_US-amy-medium":    {"lang": "en", "label": "Amy (US)",     "path": "en/en_US/amy/medium",    "approx_mb": 63},
+        "en_GB-alan-medium":   {"lang": "en", "label": "Alan (UK)",    "path": "en/en_GB/alan/medium",   "approx_mb": 63},
+        "fr_FR-siwis-medium":  {"lang": "fr", "label": "Siwis",        "path": "fr/fr_FR/siwis/medium",  "approx_mb": 63, "default": true},
+        "fr_FR-tom-medium":    {"lang": "fr", "label": "Tom",          "path": "fr/fr_FR/tom/medium",    "approx_mb": 63}
+      }
+    },
+    "kokoro": {
+      "approx_mb": 340,
+      "files": [
+        {"name": "kokoro-v1.0.onnx", "url": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx"},
+        {"name": "voices-v1.0.bin",  "url": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin"}
+      ],
+      "voices": [
+        {"id": "af_heart",  "lang": "en", "label": "Heart (US)"},
+        {"id": "am_michael", "lang": "en", "label": "Michael (US)"},
+        {"id": "bf_emma",   "lang": "en", "label": "Emma (UK)"},
+        {"id": "ff_siwis",  "lang": "fr", "label": "Siwis"}
+      ]
+    }
+  }
+}

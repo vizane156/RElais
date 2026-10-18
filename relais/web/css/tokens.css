@@ -1,0 +1,80 @@
+:root {
+  color-scheme: light;
+
+  /* Papier et encre : gris froid, jamais crème. */
+  --paper: #E8EBED;
+  --paper-2: #DEE2E5;
+  --paper-3: #D0D6DA;
+  --lift: #F4F6F7;
+  --ink: #11151A;
+  --ink-2: #46515B;
+  --ink-3: #66727C;
+  --rule: #C0C8CE;
+  --rule-2: #A4AEB6;
+
+  /* Une couleur par langue. Réglables dans Réglages > Interface. */
+  --a: #2C3FD4;
+  --b: #E4580A;
+  --a-ink: color-mix(in oklab, var(--a) 58%, var(--ink));
+  --b-ink: color-mix(in oklab, var(--b) 58%, var(--ink));
+
+  /* Les voyants du pupitre : un seul ambre pour « allumé ». */
+  --lamp: #FFB000;
+  --lamp-edge: #B07400;
+  --lamp-glow: rgb(255 176 0 / 0.38);
+  --warn: #B3261E;
+  --scrim: rgb(10 14 18 / 0.42);
+
+  --font-ui: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", ui-sans-serif, system-ui,
+             "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-text: "Literata", Charter, "Bitstream Charter", "Iowan Old Style", "Palatino Linotype",
+               "Book Antiqua", Georgia, serif;
+
+  --t-xs: 0.75rem;
+  --t-sm: 0.8125rem;
+  --t-md: 0.9375rem;
+  --t-lg: 1.0625rem;
+
+  --s1: 0.25rem; --s2: 0.5rem; --s3: 0.75rem; --s4: 1rem; --s5: 1.5rem; --s6: 2.25rem; --s7: 3.5rem;
+  --r-s: 4px; --r-m: 8px;
+
+  --scale: 1;          /* taille du texte de la conversation (réglage) */
+  --m: 1;              /* multiplicateur de mouvement : 0 = aucun */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --t-fast: calc(120ms * var(--m));
+  --t-med: calc(220ms * var(--m));
+  --t-slow: calc(420ms * var(--m));
+
+  --page-max: 84rem;
+}
+
+:root[data-density="compact"] { --s3: 0.55rem; --s4: 0.8rem; --s5: 1.1rem; }
+
+/* Sombre : papier d'encre bleutée, couleurs de langue éclaircies pour garder le contraste. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #12171B; --paper-2: #181E23; --paper-3: #232B32; --lift: #1D252B;
+    --ink: #E6EAED; --ink-2: #A5B0B9; --ink-3: #8794A0;
+    --rule: #2D373F; --rule-2: #424F5A;
+    --a: #8E9BFF; --b: #FF8F52;
+    --lamp-glow: rgb(255 176 0 / 0.3);
+    --scrim: rgb(0 0 0 / 0.55);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #12171B; --paper-2: #181E23; --paper-3: #232B32; --lift: #1D252B;
+  --ink: #E6EAED; --ink-2: #A5B0B9; --ink-3: #8794A0;
+  --rule: #2D373F; --rule-2: #424F5A;
+  --a: #8E9BFF; --b: #FF8F52;
+  --lamp-glow: rgb(255 176 0 / 0.3);
+  --scrim: rgb(0 0 0 / 0.55);
+}
+
+:root[data-font-text="atkinson"] { --font-text: var(--font-ui); }
+:root[data-font-text="system"] { --font-text: ui-serif, Georgia, "Times New Roman", serif; }
+
+:root[data-motion="calm"] { --m: 0.45; }
+:root[data-motion="off"] { --m: 0; }
+@media (prefers-reduced-motion: reduce) { :root[data-motion="full"] { --m: 0.45; } }

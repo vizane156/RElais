@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "sections": [
+    {
+      "id": "interface",
+      "label": "set.interface",
+      "fields": [
+        {"key": "ui.lang", "type": "select", "default": "fr", "label": "set.ui.lang",
+         "options": [{"value": "fr", "label": "Français"}, {"value": "en", "label": "English"}]},
+        {"key": "ui.theme", "type": "select", "default": "auto", "label": "set.ui.theme",
+         "options": [{"value": "auto", "label_key": "opt.auto"}, {"value": "light", "label_key": "opt.light"}, {"value": "dark", "label_key": "opt.dark"}]},
+        {"key": "ui.layout", "type": "select", "default": "auto", "label": "set.ui.layout", "hint": "set.ui.layout.hint",
+         "options": [{"value": "auto", "label_key": "opt.auto"}, {"value": "facing", "label_key": "opt.facing"}, {"value": "stacked", "label_key": "opt.stacked"}]},
+        {"key": "ui.font_text", "type": "select", "default": "literata", "label": "set.ui.font_text", "hint": "set.ui.font_text.hint",
+         "options": [{"value": "literata", "label": "Literata"}, {"value": "atkinson", "label": "Atkinson Hyperlegible"}, {"value": "system", "label_key": "opt.system"}]},
+        {"key": "ui.text_scale", "type": "range", "default": 1.0, "min": 0.85, "max": 1.7, "step": 0.05, "format": "percent", "label": "set.ui.text_scale"},
+        {"key": "ui.density", "type": "select", "default": "comfortable", "label": "set.ui.density",
+         "options": [{"value": "comfortable", "label_key": "opt.comfortable"}, {"value": "compact", "label_key": "opt.compact"}]},
+        {"key": "ui.motion", "type": "select", "default": "full", "label": "set.ui.motion", "hint": "set.ui.motion.hint",
+         "options": [{"value": "full", "label_key": "opt.motion_full"}, {"value": "calm", "label_key": "opt.motion_calm"}, {"value": "off", "label_key": "opt.motion_off"}]},
+        {"key": "ui.color_a", "type": "color", "default": "#2C3FD4", "label": "set.ui.color_a", "lang_label": "a"},
+        {"key": "ui.color_b", "type": "color", "default": "#E4580A", "label": "set.ui.color_b", "lang_label": "b"},
+        {"key": "ui.show_original", "type": "toggle", "default": true, "label": "set.ui.show_original", "hint": "set.ui.show_original.hint"},
+        {"key": "ui.show_latency", "type": "toggle", "default": true, "label": "set.ui.show_latency"}
+      ]
+    },
+    {
+      "id": "languages",
+      "label": "set.languages",
+      "fields": [
+        {"key": "pair.me", "type": "select", "default": "b", "label": "set.pair.me", "hint": "set.pair.me.hint", "options_from": "pair"}
+      ]
+    },
+    {
+      "id": "listen",
+      "label": "set.listen",
+      "cap": "listen",
+      "fields": [
+        {"key": "listen.who", "type": "select", "default": "auto", "label": "set.listen.who", "hint": "set.listen.who.hint", "options_from": "who"},
+        {"key": "listen.model", "type": "select", "default": "base", "label": "set.listen.model", "hint": "set.listen.model.hint", "reload": "listen",
+         "options": [{"value": "tiny", "label_key": "opt.model_tiny"}, {"value": "base", "label_key": "opt.model_base"}, {"value": "small", "label_key": "opt.model_small"}]},
+        {"key": "listen.partials", "type": "toggle", "default": true, "label": "set.listen.partials", "hint": "set.listen.partials.hint"},
+        {"key": "listen.silence_ms", "type": "range", "default": 700, "min": 250, "max": 1600, "step": 50, "unit": "ms", "label": "set.listen.silence_ms", "hint": "set.listen.silence_ms.hint"},
+        {"key": "listen.sensitivity", "type": "range", "default": 0.5, "min": 0, "max": 1, "step": 0.05, "format": "percent", "label": "set.listen.sensitivity", "hint": "set.listen.sensitivity.hint"},
+        {"key": "listen.echo_guard", "type": "toggle", "default": true, "label": "set.listen.echo_guard", "hint": "set.listen.echo_guard.hint"},
+        {"key": "listen.device", "type": "select", "default": "", "label": "set.listen.device", "options_from": "client.audioinputs", "profile": false}
+      ]
+    },
+    {
+      "id": "translate",
+      "label": "set.translate",
+      "cap": "translate",
+      "fields": [
+        {"key": "translate.live", "type": "toggle", "default": true, "label": "set.translate.live", "hint": "set.translate.live.hint"},
+        {"key": "translate.quality", "type": "select", "default": "fast", "label": "set.translate.quality", "hint": "set.translate.quality.hint",
+         "options": [{"value": "fast", "label_key": "opt.q_fast"}, {"value": "balanced", "label_key": "opt.q_balanced"}, {"value": "best", "label_key": "opt.q_best"}]},
+        {"key": "translate.glossary", "type": "toggle", "default": true, "label": "set.translate.glossary", "hint": "set.translate.glossary.hint"}
+      ]
+    },
+    {
+      "id": "speak",
+      "label": "set.speak",
+      "cap": "speak",
+      "fields": [
+        {"key": "speak.translations", "type": "toggle", "default": true, "label": "set.speak.translations", "hint": "set.speak.translations.hint"},
+        {"key": "speak.originals", "type": "toggle", "default": false, "label": "set.speak.originals", "hint": "set.speak.originals.hint"},
+        {"key": "speak.engine", "type": "select", "default": "piper", "label": "set.speak.engine", "hint": "set.speak.engine.hint", "reload": "speak",
+         "options": [{"value": "piper", "label": "Piper"}, {"value": "kokoro", "label": "Kokoro"}]},
+        {"key": "speak.voice_a", "type": "select", "default": "", "label": "set.speak.voice", "lang_label": "a", "options_from": "voices.a"},
+        {"key": "speak.voice_b", "type": "select", "default": "", "label": "set.speak.voice", "lang_label": "b", "options_from": "voices.b"},
+        {"key": "speak.rate", "type": "range", "default": 1.0, "min": 0.6, "max": 1.6, "step": 0.05, "format": "rate", "label": "set.speak.rate"},
+        {"key": "speak.volume", "type": "range", "default": 0.9, "min": 0, "max": 1, "step": 0.05, "format": "percent", "label": "set.speak.volume"},
+        {"key": "speak.device", "type": "select", "default": "", "label": "set.speak.device", "hint": "set.speak.device.hint", "options_from": "client.audiooutputs", "profile": false}
+      ]
+    },
+    {
+      "id": "typespeak",
+      "label": "set.typespeak",
+      "cap": "typespeak",
+      "fields": [
+        {"key": "type.lang", "type": "select", "default": "me", "label": "set.type.lang", "options_from": "me_other"},
+        {"key": "type.say", "type": "select", "default": "other", "label": "set.type.say", "hint": "set.type.say.hint", "options_from": "me_other"},
+        {"key": "type.rhythm", "type": "select", "default": "group", "label": "set.type.rhythm", "hint": "set.type.rhythm.hint",
+         "options": [{"value": "word", "label_key": "opt.rhythm_word"}, {"value": "group", "label_key": "opt.rhythm_group"}, {"value": "sentence", "label_key": "opt.rhythm_sentence"}]},
+        {"key": "type.pause_ms", "type": "range", "default": 380, "min": 150, "max": 1200, "step": 10, "unit": "ms", "label": "set.type.pause_ms", "hint": "set.type.pause_ms.hint"},
+        {"key": "type.min_words", "type": "range", "default": 3, "min": 1, "max": 8, "step": 1, "label": "set.type.min_words", "hint": "set.type.min_words.hint"}
+      ]
+    },
+    {
+      "id": "record",
+      "label": "set.record",
+      "cap": "record",
+      "fields": [
+        {"key": "record.keep_utterances", "type": "toggle", "default": false, "label": "set.record.keep_utterances", "hint": "set.record.keep_utterances.hint"}
+      ]
+    },
+    {
+      "id": "performance",
+      "label": "set.performance",
+      "fields": [
+        {"key": "perf.unload_when_off", "type": "toggle", "default": true, "label": "set.perf.unload_when_off", "hint": "set.perf.unload_when_off.hint"},
+        {"key": "perf.threads", "type": "select", "default": 0, "label": "set.perf.threads", "hint": "set.perf.threads.hint",
+         "options": [{"value": 0, "label_key": "opt.auto"}, {"value": 1, "label": "1"}, {"value": 2, "label": "2"}, {"value": 4, "label": "4"}, {"value": 8, "label": "8"}]},
+        {"key": "history.save", "type": "toggle", "default": true, "label": "set.history.save", "hint": "set.history.save.hint"}
+      ]
+    }
+  ],
+  "hidden": [
+    {"key": "pair.left", "type": "select", "default": "a", "options": [{"value": "a"}, {"value": "b"}]},
+    {"key": "caps.on", "type": "caps", "default": [], "profile": false}
+  ]
+}
