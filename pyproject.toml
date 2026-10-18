@@ -26,5 +26,10 @@ relais = "relais.__main__:main"
 [tool.setuptools.packages.find]
 include = ["relais*"]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: tests requiring real AI models"]
+addopts = "--ignore=tests/integration -q"
+
 [tool.setuptools.package-data]
 relais = ["data/*.json", "web/*.html", "web/css/*", "web/js/**/*", "web/i18n/*", "web/assets/*", "web/fonts/*"]

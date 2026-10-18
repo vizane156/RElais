@@ -17,19 +17,23 @@ def _download(url: str, dest: Path, label: str) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     part = dest.with_name(dest.name + ".part")
     req = urllib.request.Request(url, headers={"User-Agent": "relais/0.1"})
-    with urllib.request.urlopen(req, timeout=60) as r, open(part, "wb") as fh:
-        total = int(r.headers.get("Content-Length") or 0)
-        got, last = 0, -1
-        while True:
-            buf = r.read(1 << 20)
-            if not buf:
-                break
-            fh.write(buf)
-            got += len(buf)
-            pct = int(got * 100 / total) if total else -1
-            if pct != last and sys.stderr.isatty():
-                print(f"\r  {label} {pct if pct >= 0 else '?':>3}% ({got >> 20} Mo)", end="", file=sys.stderr)
-                last = pct
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r, open(part, "wb") as fh:
+            total = int(r.headers.get("Content-Length") or 0)
+            got, last = 0, -1
+            while True:
+                buf = r.read(1 << 20)
+                if not buf:
+                    break
+                fh.write(buf)
+                got += len(buf)
+                pct = int(got * 100 / total) if total else -1
+                if pct != last and sys.stderr.isatty():
+                    print(f"\r  {label} {pct if pct >= 0 else '?':>3}% ({got >> 20} Mo)", end="", file=sys.stderr)
+                    last = pct
+    except Exception:
+        part.unlink(missing_ok=True)
+        raise
     if sys.stderr.isatty():
         print(file=sys.stderr)
     os.replace(part, dest)
@@ -49,7 +53,9 @@ def _pull_mt(paths: Paths, manifest: dict) -> bool:
         print(f"  traduction {key} : conversion de {m['source']} en int8…")
         try:
             subprocess.run(cmd, check=True)
-        except (subprocess.CalledProcessError, FileNotFoundError):
+        except FileNotFoundError as exc:
+            raise RuntimeError("CTranslate2 converter unavailable; install relais[mt,convert]") from exc
+        except subprocess.CalledProcessError:
             print("  ✗ conversion impossible. Installe l'outil : pip install \"relais[mt,convert]\"", file=sys.stderr)
             ok = False
     return ok
@@ -102,6 +108,11 @@ def _pull_kokoro(paths: Paths, manifest: dict) -> bool:
             continue
         try:
             _download(f["url"], dest, f["name"])
+            if dest.suffix == ".onnx" and (not dest.exists() or not dest.read_bytes() or dest.read_bytes()[0:1] != b"\\x08"):
+                dest.unlink(missing_ok=True)
+                raise RuntimeError(f"Downloaded file appears corrupt: {dest}")
+        except RuntimeError:
+            raise
         except Exception as exc:  # noqa: BLE001
             print(f"  ✗ {f['name']} : {exc}", file=sys.stderr)
             ok = False
