@@ -1,0 +1,7 @@
+{
+  "name": "Relais",
+  "description": "Bilingual voice translator (English ↔ French) and meeting transcription hub with automated AI note-taking, speaker diarization, action items, and conversation folio.",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
