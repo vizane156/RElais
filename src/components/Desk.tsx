@@ -3,13 +3,13 @@ import { useApp } from '../context/AppContext';
 import { Icon } from './Icon';
 import { AudioMeter } from './AudioMeter';
 
-const KEY_DEFS = [
+const KEY_DEFS: Array<{ id: string; icon: string; section?: string; planned?: boolean }> = [
   { id: 'listen', icon: 'mic', section: 'listen' },
   { id: 'translate', icon: 'dialogue', section: 'translate' },
   { id: 'speak', icon: 'speaker', section: 'speak' },
   { id: 'typespeak', icon: 'type', section: 'typespeak' },
   { id: 'record', icon: 'record', section: 'record' },
-  { id: 'clone', icon: 'clone', planned: true },
+  { id: 'clone', icon: 'clone', section: 'library' },
 ];
 
 export const Desk: React.FC = () => {

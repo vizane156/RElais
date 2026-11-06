@@ -5,6 +5,7 @@ import { MicTap } from '../../audio/capture';
 import { encodeWav, concatInt16, f32ToInt16, fileToWav } from '../../audio/wav';
 import { AudioMeter } from '../AudioMeter';
 import { VoiceRecording } from '../../services/storage';
+import { CloneVoiceService, CloneVoiceProfile } from '../../services/cloneVoiceService';
 
 const fmtTime = (s: number) =>
   `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
@@ -20,7 +21,12 @@ export const LibraryPanel: React.FC = () => {
     updateRecordingName,
     deleteRecording,
     showToast,
+    player,
   } = useApp();
+
+  const [activeCloneProfile, setActiveCloneProfile] = useState<CloneVoiceProfile>(() => CloneVoiceService.getActiveProfile());
+  const [availableProfiles, setAvailableProfiles] = useState<CloneVoiceProfile[]>(() => CloneVoiceService.getAvailableProfiles());
+  const [isTestingClone, setIsTestingClone] = useState(false);
 
   const [isRecording, setIsRecording] = useState(false);
   const [recordSeconds, setRecordSeconds] = useState(0);
@@ -181,6 +187,67 @@ export const LibraryPanel: React.FC = () => {
         {t('library.tip')}
       </p>
 
+      {/* Profil de Voix Clonée Actif */}
+      <div
+        style={{
+          padding: 'var(--s3, 1rem)',
+          background: 'var(--lift, #202430)',
+          borderRadius: 'var(--r-m, 8px)',
+          border: '1px solid var(--rule-2, #333a4d)',
+          marginBottom: '1.25rem',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Icon name="clone" className="ic sm" />
+            <strong style={{ fontSize: '0.95rem' }}>{t('clone.title')}</strong>
+          </div>
+          <span className="tag" style={{ color: activeCloneProfile.timberColor, borderColor: activeCloneProfile.timberColor }}>
+            ● {activeCloneProfile.name}
+          </span>
+        </div>
+        <p style={{ fontSize: '0.82rem', color: 'var(--ink-2)', marginBottom: '0.75rem' }}>
+          {t('clone.hint')}
+        </p>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+          <select
+            style={{ fontSize: '0.85rem', flex: 1, minWidth: '180px' }}
+            value={activeCloneProfile.id}
+            onChange={(e) => {
+              const found = availableProfiles.find((p) => p.id === e.target.value);
+              if (found) {
+                CloneVoiceService.setActiveProfile(found);
+                setActiveCloneProfile(found);
+                showToast(`Voix clonée : ${found.name}`);
+              }
+            }}
+          >
+            {availableProfiles.map((p) => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
+
+          <button
+            className="btn"
+            type="button"
+            disabled={isTestingClone}
+            onClick={async () => {
+              setIsTestingClone(true);
+              const sampleMsg = activeCloneProfile.sampleText || "Bonjour, voici ma voix clonée dans Relais !";
+              await CloneVoiceService.speakCloned(sampleMsg, activeCloneProfile.lang || 'fr', player, {
+                onEnd: () => setIsTestingClone(false),
+                onError: () => setIsTestingClone(false),
+              });
+            }}
+            title={t('clone.test_tip')}
+          >
+            <Icon name="speaker" className="ic sm" />
+            <span>{isTestingClone ? 'Lecture...' : t('clone.test')}</span>
+          </button>
+        </div>
+      </div>
+
       {/* Voice Recorder */}
       <div className="recorder">
         <div className="rec-main">
@@ -306,6 +373,24 @@ export const LibraryPanel: React.FC = () => {
                 </div>
 
                 <div className="actions">
+                  <button
+                    className="icon-btn sm"
+                    type="button"
+                    title={t('clone.use_recording')}
+                    aria-label={t('clone.use_recording')}
+                    style={{
+                      color: activeCloneProfile.recordingId === rec.id ? '#0F9D58' : undefined,
+                    }}
+                    onClick={() => {
+                      const prof = CloneVoiceService.setFromRecording(rec);
+                      setActiveCloneProfile(prof);
+                      setAvailableProfiles(CloneVoiceService.getAvailableProfiles());
+                      showToast(`${t('clone.recording_selected')} : ${rec.name}`);
+                    }}
+                  >
+                    <Icon name="clone" className="ic sm" />
+                  </button>
+
                   <button
                     className="icon-btn sm"
                     type="button"

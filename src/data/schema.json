@@ -36,6 +36,8 @@
       "label": "set.listen",
       "cap": "listen",
       "fields": [
+        {"key": "listen.engine", "type": "select", "default": "webspeech", "label": "set.listen.engine", "hint": "set.listen.engine.hint",
+         "options": [{"value": "webspeech", "label": "Web Speech (Navigateur)"}, {"value": "vibevoice", "label": "VibeVoice-ASR-BitNet (Serveur)"}]},
         {"key": "listen.who", "type": "select", "default": "auto", "label": "set.listen.who", "hint": "set.listen.who.hint", "options_from": "who"},
         {"key": "listen.model", "type": "select", "default": "base", "label": "set.listen.model", "hint": "set.listen.model.hint", "reload": "listen",
          "options": [{"value": "tiny", "label_key": "opt.model_tiny"}, {"value": "base", "label_key": "opt.model_base"}, {"value": "small", "label_key": "opt.model_small"}]},

@@ -114,8 +114,8 @@ export class SpeechService {
   }: {
     lang: string;
     onResult: (text: string, isFinal: boolean) => void;
-    onError: (err: any) => void;
-    onEnd: () => void;
+    onError?: (err: any) => void;
+    onEnd?: () => void;
   }) {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -158,20 +158,20 @@ export class SpeechService {
 
       rec.onerror = (e: any) => {
         if (e.error !== 'no-speech') {
-          onError(e);
+          onError?.(e);
         }
       };
 
       rec.onend = () => {
         this.listening = false;
-        onEnd();
+        onEnd?.();
       };
 
       rec.start();
       this.listening = true;
       return rec;
     } catch (err) {
-      onError(err);
+      onError?.(err);
       return null;
     }
   }

@@ -9,6 +9,7 @@ import { Player } from '../audio/player';
 import { Capture } from '../audio/capture';
 import { SpeechService } from '../services/speech';
 import { TypeSpeaker } from '../audio/speakchunk';
+import { CloneVoiceService } from '../services/cloneVoiceService';
 
 export interface UtteranceItem {
   key: string;
@@ -350,7 +351,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const toggleCap = async (id: string) => {
     if (id === 'clone') {
-      showToast(t('cap.clone.planned'));
+      const cur = caps.clone || { id: 'clone', enabled: false, state: 'off' };
+      const nextOn = !cur.enabled;
+      setCaps((prev) => ({
+        ...prev,
+        clone: { id: 'clone', enabled: nextOn, state: nextOn ? 'ready' : 'off' },
+      }));
+      const profile = CloneVoiceService.getActiveProfile();
+      showToast(nextOn ? `${t('cap.clone.enabled')} (${profile.name})` : t('cap.clone.disabled'));
       return;
     }
 
@@ -382,6 +390,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const speakText = (text: string, langToSpeak: string) => {
     if (!text || !capOn('speak')) return;
     setSpeaking(true);
+
+    if (capOn('clone')) {
+      CloneVoiceService.speakCloned(text, langToSpeak, player, {
+        rate: settings['speak.rate'] ?? 1.0,
+        volume: settings['speak.volume'] ?? 0.9,
+        onStart: () => setSpeaking(true),
+        onEnd: () => setSpeaking(false),
+        onError: () => setSpeaking(false),
+      });
+      return;
+    }
+
     speechService.speak(text, langToSpeak, {
       rate: settings['speak.rate'] ?? 1.0,
       volume: settings['speak.volume'] ?? 0.9,

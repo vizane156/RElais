@@ -9,6 +9,7 @@ import {
   ActionItem,
   createSpeaker,
 } from '../../services/meeting';
+import { VibeVoiceAdapter } from '../../services/vibeVoiceService';
 
 const formatDuration = (sec: number) => {
   const m = Math.floor(sec / 60);
@@ -23,6 +24,7 @@ export const MeetingPanel: React.FC = () => {
     addOrUpdateUtterance,
     speechService,
     capOn,
+    capture,
   } = useApp();
 
   const [session, setSession] = useState<MeetingSession>(() => MeetingService.getStoredSession());
@@ -30,6 +32,8 @@ export const MeetingPanel: React.FC = () => {
   const [activeSpeakerId, setActiveSpeakerId] = useState<string>(
     () => session.speakers[0]?.id || 'spk-1'
   );
+  const [sttEngine, setSttEngine] = useState<'webspeech' | 'vibevoice'>('vibevoice');
+  const [vibeVoiceStatus, setVibeVoiceStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
   const [newSpeakerName, setNewSpeakerName] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isGeneratingNotes, setIsGeneratingNotes] = useState(false);
@@ -69,46 +73,119 @@ export const MeetingPanel: React.FC = () => {
     };
   }, [meetingState]);
 
-  // Continuous Speech Recognition when recording
+  // Dual Engine Speech Recognition when recording (VibeVoice BitNet + WebSpeech fallback)
   useEffect(() => {
+    let vibeVoiceAdapter: VibeVoiceAdapter | null = null;
+    let isMounted = true;
+
     if (meetingState === 'recording') {
       const activeSpeaker = session.speakers.find((s) => s.id === activeSpeakerId) || session.speakers[0];
-      const rec = speechService.startRecognition({
-        lang: 'fr',
-        onResult: (text: string, isFinal: boolean) => {
-          if (isFinal && text.trim()) {
-            const newUtt: MeetingUtterance = {
-              id: `utt_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-              speakerId: activeSpeaker.id,
-              speakerName: activeSpeaker.name,
-              text: text.trim(),
-              ts: Date.now(),
+
+      if (sttEngine === 'vibevoice') {
+        // Démarre la capture PCM 16kHz
+        capture.open('').catch((err) => {
+          console.warn('Impossible d\'ouvrir le micro pour VibeVoice:', err);
+        });
+
+        vibeVoiceAdapter = new VibeVoiceAdapter(capture, {
+          onTranscription: (res) => {
+            if (!isMounted) return;
+            if (res.segments && res.segments.length > 0) {
+              res.segments.forEach((seg) => {
+                if (seg.text.trim()) {
+                  // Trouve ou assigne l'interlocuteur diarizé
+                  const spk = session.speakers.find((s) => s.id === seg.speakerId) || activeSpeaker;
+                  const newUtt: MeetingUtterance = {
+                    id: `utt_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+                    speakerId: spk.id,
+                    speakerName: seg.speakerName || spk.name,
+                    text: seg.text.trim(),
+                    ts: Date.now(),
+                    lang: 'fr',
+                  };
+                  setSession((prev) => ({
+                    ...prev,
+                    utterances: [...prev.utterances, newUtt],
+                  }));
+                }
+              });
+            } else if (res.text.trim()) {
+              const newUtt: MeetingUtterance = {
+                id: `utt_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+                speakerId: activeSpeaker.id,
+                speakerName: activeSpeaker.name,
+                text: res.text.trim(),
+                ts: Date.now(),
+                lang: 'fr',
+              };
+              setSession((prev) => ({
+                ...prev,
+                utterances: [...prev.utterances, newUtt],
+              }));
+            }
+          },
+          onStatusChange: (status) => {
+            if (isMounted) setVibeVoiceStatus(status);
+          },
+          onError: (err) => {
+            console.warn('[Meeting] VibeVoice indisponible, bascule douce sur Web Speech:', err);
+            // Repli automatique sans interrompre la session
+            speechService.startRecognition({
               lang: 'fr',
-            };
-            setSession((prev) => ({
-              ...prev,
-              utterances: [...prev.utterances, newUtt],
-            }));
-          }
-        },
-        onError: (err: any) => {
-          console.warn('Erreur recognition réunion:', err);
-        },
-        onEnd: () => {
-          // Si toujours en enregistrement, relancer pour écoute continue
-          if (meetingState === 'recording') {
-            // Relance douce
-          }
-        },
-      });
+              onResult: (text: string, isFinal: boolean) => {
+                if (isFinal && text.trim()) {
+                  const newUtt: MeetingUtterance = {
+                    id: `utt_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+                    speakerId: activeSpeaker.id,
+                    speakerName: activeSpeaker.name,
+                    text: text.trim(),
+                    ts: Date.now(),
+                    lang: 'fr',
+                  };
+                  setSession((prev) => ({
+                    ...prev,
+                    utterances: [...prev.utterances, newUtt],
+                  }));
+                }
+              },
+            });
+          },
+        });
+
+        vibeVoiceAdapter.connect().catch(() => {});
+      } else {
+        // Mode direct Web Speech API
+        speechService.startRecognition({
+          lang: 'fr',
+          onResult: (text: string, isFinal: boolean) => {
+            if (isFinal && text.trim()) {
+              const newUtt: MeetingUtterance = {
+                id: `utt_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+                speakerId: activeSpeaker.id,
+                speakerName: activeSpeaker.name,
+                text: text.trim(),
+                ts: Date.now(),
+                lang: 'fr',
+              };
+              setSession((prev) => ({
+                ...prev,
+                utterances: [...prev.utterances, newUtt],
+              }));
+            }
+          },
+        });
+      }
 
       return () => {
+        isMounted = false;
+        if (vibeVoiceAdapter) vibeVoiceAdapter.disconnect();
         speechService.stopRecognition();
       };
     } else {
+      setVibeVoiceStatus('disconnected');
       speechService.stopRecognition();
     }
-  }, [meetingState, activeSpeakerId, session.speakers]);
+  }, [meetingState, sttEngine, activeSpeakerId, session.speakers, capture, speechService]);
 
   // Auto-scroll transcript
   useEffect(() => {
@@ -439,7 +516,63 @@ export const MeetingPanel: React.FC = () => {
           <Icon name="plus" className="ic sm" />
           Nouvelle réunion
         </button>
+
+        {/* Engine Switcher (VibeVoice BitNet vs Web Speech) */}
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.78rem', color: 'var(--ink-2)', fontWeight: 600 }}>{t('meeting.engine')}:</span>
+          <div className="seg" role="radiogroup" style={{ display: 'inline-flex' }}>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={sttEngine === 'vibevoice'}
+              style={{ padding: '0.25rem 0.55rem', fontSize: '0.76rem', fontWeight: 600 }}
+              onClick={() => setSttEngine('vibevoice')}
+              title="VibeVoice BitNet ASR & Diarisation multi-locuteurs"
+            >
+              VibeVoice BitNet
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={sttEngine === 'webspeech'}
+              style={{ padding: '0.25rem 0.55rem', fontSize: '0.76rem', fontWeight: 600 }}
+              onClick={() => setSttEngine('webspeech')}
+              title="Web Speech API du navigateur"
+            >
+              Web Speech
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* VibeVoice Status Banner */}
+      {sttEngine === 'vibevoice' && (
+        <div
+          style={{
+            fontSize: '0.78rem',
+            padding: '0.4rem 0.75rem',
+            borderRadius: 'var(--r-sm, 4px)',
+            background: vibeVoiceStatus === 'connected' ? 'rgba(15, 157, 88, 0.12)' : 'var(--lift, #202430)',
+            border: `1px solid ${vibeVoiceStatus === 'connected' ? '#0F9D58' : 'var(--rule)'}`,
+            color: vibeVoiceStatus === 'connected' ? '#0F9D58' : 'var(--ink-2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '0.5rem',
+          }}
+        >
+          <span>
+            {vibeVoiceStatus === 'connected'
+              ? `⚡ ${t('meeting.vibevoice_connected')}`
+              : vibeVoiceStatus === 'connecting'
+              ? '⏳ Connexion au service VibeVoice BitNet (ws://localhost:8000)...'
+              : `ℹ️ ${t('meeting.vibevoice_fallback')}`}
+          </span>
+          <span style={{ opacity: 0.75, fontSize: '0.72rem', whiteSpace: 'nowrap' }}>
+            {vibeVoiceStatus === 'connected' ? 'Port 8000 (Docker CPU)' : 'Mode résilient actif'}
+          </span>
+        </div>
+      )}
 
       {/* Attribution des interlocuteurs (Speaker Diarization) */}
       <div style={{ padding: 'var(--s3)', background: 'var(--lift)', borderRadius: 'var(--r-m)', border: '1px solid var(--rule)' }}>

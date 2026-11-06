@@ -23,9 +23,6 @@ export const Header: React.FC = () => {
       <div className="brand">
         <Icon name="mark" className="ic mark" />
         <span className="brand-name">Relais</span>
-        <span className="badge-demo" id="demoBadge" title={t('demo.hint')}>
-          {t('demo.badge')}
-        </span>
       </div>
 
       <div className="pair" role="group">
