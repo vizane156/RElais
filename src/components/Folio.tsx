@@ -83,14 +83,14 @@ export const Folio: React.FC = () => {
             </div>
           </div>
         ) : (
-          utterances.map((item) => {
+          utterances.map((item, idx) => {
             const saidSide = item.side;
             const heardSide = item.side === 'a' ? 'b' : 'a';
             const hasTr = !!(item.translation && item.translation.trim());
 
             return (
               <article
-                key={item.key}
+                key={`utt-${item.key || idx}-${idx}`}
                 className="utt enter"
                 data-key={item.key}
                 data-state={item.state}

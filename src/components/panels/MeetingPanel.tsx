@@ -398,6 +398,90 @@ export const MeetingPanel: React.FC = () => {
 
   return (
     <div className="panel" id="panel-meeting" style={{ display: 'grid', gap: 'var(--s4)' }}>
+      {/* Bannière d'illustration Hub Réunion */}
+      <div
+        className="meeting-hero-banner"
+        style={{
+          position: 'relative',
+          borderRadius: 'var(--r-m, 10px)',
+          overflow: 'hidden',
+          border: '1px solid var(--rule-2, rgba(255,255,255,0.08))',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+          maxHeight: '190px',
+          display: 'flex',
+          alignItems: 'flex-end',
+        }}
+      >
+        <img
+          src="/assets/hub_reunion_banner.jpg"
+          alt="Illustration Hub Réunion Relais — Transcription, Ondes Vocales & Prise de Notes IA"
+          style={{
+            width: '100%',
+            height: '100%',
+            maxHeight: '190px',
+            objectFit: 'cover',
+            display: 'block',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to top, rgba(15,17,23,0.85) 0%, rgba(15,17,23,0.2) 50%, transparent 100%)',
+            pointerEvents: 'none',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '0.85rem',
+            left: '1rem',
+            right: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '0.5rem',
+            pointerEvents: 'none',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                padding: '0.25rem 0.65rem',
+                background: 'rgba(20, 24, 35, 0.75)',
+                backdropFilter: 'blur(8px)',
+                borderRadius: '999px',
+                border: '1px solid rgba(255,255,255,0.15)',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                color: '#fff',
+                letterSpacing: '0.02em',
+              }}
+            >
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2C3FD4', boxShadow: '0 0 6px #2C3FD4' }} />
+              Hub Réunion & Diarisation
+            </span>
+          </div>
+          <span
+            style={{
+              padding: '0.25rem 0.55rem',
+              background: 'rgba(20, 24, 35, 0.75)',
+              backdropFilter: 'blur(8px)',
+              borderRadius: '6px',
+              border: '1px solid rgba(255,255,255,0.12)',
+              fontSize: '0.72rem',
+              color: 'var(--ink-2, #cbd5e1)',
+              fontWeight: 600,
+            }}
+          >
+            VibeVoice-ASR • Notes IA
+          </span>
+        </div>
+      </div>
+
       {/* En-tête de réunion Otter */}
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--s2)', borderBottom: '1px solid var(--rule)', paddingBottom: 'var(--s3)' }}>
         <div>
@@ -580,18 +664,18 @@ export const MeetingPanel: React.FC = () => {
           {t('meeting.current_speaker')} :
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center' }}>
-          {session.speakers.map((spk) => {
+          {session.speakers.map((spk, spkIdx) => {
             const isSelected = activeSpeakerId === spk.id;
             return (
               <button
-                key={spk.id}
+                key={`spk-btn-${spk.id || spkIdx}-${spkIdx}`}
                 type="button"
                 onClick={() => setActiveSpeakerId(spk.id)}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.45rem',
-                  padding: '0.35rem 0.75rem',
+                  padding: '0.3rem 0.75rem',
                   borderRadius: '999px',
                   border: `2px solid ${spk.color}`,
                   background: isSelected ? spk.color : 'transparent',
@@ -602,21 +686,36 @@ export const MeetingPanel: React.FC = () => {
                   transition: 'all 0.15s ease',
                 }}
               >
-                <span
-                  style={{
-                    width: '1.2rem',
-                    height: '1.2rem',
-                    borderRadius: '50%',
-                    backgroundColor: isSelected ? 'rgba(255,255,255,0.3)' : spk.color,
-                    color: '#ffffff',
-                    display: 'grid',
-                    placeItems: 'center',
-                    fontSize: '0.7rem',
-                    fontWeight: 800,
-                  }}
-                >
-                  {spk.initial}
-                </span>
+                {spk.avatarUrl ? (
+                  <img
+                    src={spk.avatarUrl}
+                    alt={spk.name}
+                    style={{
+                      width: '1.45rem',
+                      height: '1.45rem',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '1.5px solid rgba(255,255,255,0.7)',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+                    }}
+                  />
+                ) : (
+                  <span
+                    style={{
+                      width: '1.25rem',
+                      height: '1.25rem',
+                      borderRadius: '50%',
+                      backgroundColor: isSelected ? 'rgba(255,255,255,0.3)' : spk.color,
+                      color: '#ffffff',
+                      display: 'grid',
+                      placeItems: 'center',
+                      fontSize: '0.7rem',
+                      fontWeight: 800,
+                    }}
+                  >
+                    {spk.initial}
+                  </span>
+                )}
                 {spk.name}
               </button>
             );
@@ -670,22 +769,23 @@ export const MeetingPanel: React.FC = () => {
               {t('meeting.no_transcript')}
             </p>
           ) : (
-            filteredUtterances.map((u) => {
+            filteredUtterances.map((u, uIdx) => {
               const spk = session.speakers.find((s) => s.id === u.speakerId) || {
                 name: u.speakerName,
                 color: 'var(--ink)',
                 initial: u.speakerName.charAt(0).toUpperCase(),
+                avatarUrl: undefined,
               };
 
               return (
                 <div
-                  key={u.id}
+                  key={`mtg-u-${u.id || uIdx}-${uIdx}`}
                   style={{
                     display: 'grid',
                     gridTemplateColumns: 'auto minmax(0, 1fr)',
                     gap: '0.75rem',
                     alignItems: 'start',
-                    padding: '0.5rem 0.65rem',
+                    padding: '0.6rem 0.75rem',
                     borderRadius: 'var(--r-s)',
                     background: 'var(--lift)',
                     borderLeft: `4px solid ${spk.color}`,
@@ -693,18 +793,42 @@ export const MeetingPanel: React.FC = () => {
                 >
                   <div
                     style={{
-                      width: '2rem',
-                      height: '2rem',
+                      width: '2.4rem',
+                      height: '2.4rem',
                       borderRadius: '50%',
+                      overflow: 'hidden',
                       backgroundColor: spk.color,
-                      color: '#fff',
-                      display: 'grid',
-                      placeItems: 'center',
-                      fontWeight: 750,
-                      fontSize: '0.8rem',
+                      border: `2px solid ${spk.color}`,
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.22)',
+                      flexShrink: 0,
                     }}
                   >
-                    {spk.initial}
+                    {spk.avatarUrl ? (
+                      <img
+                        src={spk.avatarUrl}
+                        alt={spk.name}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          display: 'block',
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          display: 'grid',
+                          placeItems: 'center',
+                          color: '#fff',
+                          fontWeight: 750,
+                          fontSize: '0.85rem',
+                        }}
+                      >
+                        {spk.initial}
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -724,8 +848,8 @@ export const MeetingPanel: React.FC = () => {
                           aria-label={t('meeting.reassign')}
                           style={{ padding: '0 0.3rem', fontSize: '0.7rem', height: '1.4rem' }}
                         >
-                          {session.speakers.map((s) => (
-                            <option key={s.id} value={s.id}>
+                          {session.speakers.map((s, sIdx) => (
+                            <option key={`reassign-spk-${s.id || sIdx}-${sIdx}`} value={s.id}>
                               {s.name}
                             </option>
                           ))}
@@ -800,9 +924,9 @@ export const MeetingPanel: React.FC = () => {
           {/* Tags */}
           {session.notes.tags && session.notes.tags.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-              {session.notes.tags.map((tag) => (
+              {session.notes.tags.map((tag, tagIdx) => (
                 <span
-                  key={tag}
+                  key={`tag-${tag}-${tagIdx}`}
                   className="tag"
                   style={{
                     backgroundColor: 'var(--paper)',
@@ -836,7 +960,7 @@ export const MeetingPanel: React.FC = () => {
               <ul style={{ margin: 0, padding: 0, display: 'grid', gap: '0.4rem' }}>
                 {session.notes.keyPoints.map((point, idx) => (
                   <li
-                    key={idx}
+                    key={`kp-${idx}`}
                     style={{
                       display: 'flex',
                       alignItems: 'start',
@@ -861,9 +985,9 @@ export const MeetingPanel: React.FC = () => {
             </h4>
 
             <div style={{ display: 'grid', gap: '0.4rem', marginBottom: 'var(--s3)' }}>
-              {session.notes.actionItems.map((act) => (
+              {session.notes.actionItems.map((act, actIdx) => (
                 <div
-                  key={act.id}
+                  key={`act-${act.id || actIdx}-${actIdx}`}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -938,8 +1062,8 @@ export const MeetingPanel: React.FC = () => {
                 style={{ padding: '0.4rem 0.6rem', fontSize: 'var(--t-xs)', maxWidth: '9rem' }}
               >
                 <option value="">{t('meeting.assignee')}...</option>
-                {session.speakers.map((s) => (
-                  <option key={s.id} value={s.name}>
+                {session.speakers.map((s, sIdx) => (
+                  <option key={`act-spk-${s.id || sIdx}-${sIdx}`} value={s.name}>
                     {s.name}
                   </option>
                 ))}
@@ -960,7 +1084,7 @@ export const MeetingPanel: React.FC = () => {
               <div style={{ display: 'grid', gap: '0.4rem' }}>
                 {session.notes.decisions.map((dec, idx) => (
                   <div
-                    key={idx}
+                    key={`dec-${idx}`}
                     style={{
                       background: 'var(--paper)',
                       padding: '0.6rem 0.8rem',

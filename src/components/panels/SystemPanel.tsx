@@ -23,11 +23,11 @@ export const SystemPanel: React.FC = () => {
   ];
 
   const renderGroup = (title: string, list: any[]) => (
-    <React.Fragment key={title}>
+    <React.Fragment key={`sys-grp-${title}`}>
       <h3>{title}</h3>
       <dl className="sys-list">
-        {list.map((m) => (
-          <div key={m.id}>
+        {list.map((m, mIdx) => (
+          <div key={`sys-item-${m.id}-${mIdx}`}>
             <dt>{`${m.id}${m.lang ? ` (${m.lang})` : ''}`}</dt>
             <dd>
               ~{m.mb} Mo ·{' '}
@@ -43,6 +43,36 @@ export const SystemPanel: React.FC = () => {
 
   return (
     <div className="panel" id="panel-system">
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1rem',
+          padding: '1rem',
+          background: 'var(--lift, #202430)',
+          borderRadius: 'var(--r-m, 8px)',
+          border: '1px solid var(--rule-2, #333a4d)',
+          marginBottom: '1.25rem',
+        }}
+      >
+        <img
+          src="/assets/relais_logo_relief_transparent.png"
+          alt="Logo Relais en relief"
+          style={{
+            width: '60px',
+            height: '60px',
+            objectFit: 'contain',
+            filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.35))',
+          }}
+        />
+        <div>
+          <strong style={{ fontSize: '1.15rem', display: 'block', color: 'var(--ink)' }}>Relais</strong>
+          <span style={{ fontSize: '0.82rem', color: 'var(--ink-2)' }}>
+            Station d'interprétation bilingue & Hub de réunion
+          </span>
+        </div>
+      </div>
+
       <dl className="sys-list">
         <div>
           <dt>{t('system.version')}</dt>

@@ -28,11 +28,13 @@ export const SettingsPanel: React.FC = () => {
   useEffect(() => {
     if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
       navigator.mediaDevices.enumerateDevices().then((devices) => {
+        const seenIn = new Set<string>();
         const ins = devices
-          .filter((d) => d.kind === 'audioinput')
+          .filter((d) => d.kind === 'audioinput' && d.deviceId && !seenIn.has(d.deviceId) && seenIn.add(d.deviceId))
           .map((d, i) => ({ value: d.deviceId, label: d.label || `${t('set.listen.device')} ${i + 1}` }));
+        const seenOut = new Set<string>();
         const outs = devices
-          .filter((d) => d.kind === 'audiooutput')
+          .filter((d) => d.kind === 'audiooutput' && d.deviceId && !seenOut.has(d.deviceId) && seenOut.add(d.deviceId))
           .map((d, i) => ({ value: d.deviceId, label: d.label || `${t('set.speak.device')} ${i + 1}` }));
         setAudioDevices({ inputs: ins, outputs: outs });
       }).catch(() => {});
@@ -147,8 +149,8 @@ export const SettingsPanel: React.FC = () => {
             aria-label={t('settings.profile')}
           >
             <option value="">{t('settings.profile.none')}</option>
-            {profiles.map((p) => (
-              <option key={p} value={p}>
+            {profiles.map((p, pIdx) => (
+              <option key={`prof-${p}-${pIdx}`} value={p}>
                 {p}
               </option>
             ))}
@@ -242,8 +244,8 @@ export const SettingsPanel: React.FC = () => {
                           updateSetting({ [f.key]: typed });
                         }}
                       >
-                        {getOptionsForField(f).map((opt: any) => (
-                          <option key={String(opt.value)} value={String(opt.value)}>
+                        {getOptionsForField(f).map((opt: any, optIdx: number) => (
+                          <option key={`${f.key}-${String(opt.value || 'def')}-${optIdx}`} value={String(opt.value)}>
                             {opt.label}
                           </option>
                         ))}

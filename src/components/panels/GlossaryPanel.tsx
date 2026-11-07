@@ -46,7 +46,7 @@ export const GlossaryPanel: React.FC = () => {
       ) : (
         <div>
           {rules.map((rule, idx) => (
-            <div key={idx} className="gloss-row">
+            <div key={`rule-${rule.term || 'r'}-${idx}`} className="gloss-row">
               <select
                 value={rule.src}
                 onChange={(e) => handleChangeRule(idx, { src: e.target.value })}

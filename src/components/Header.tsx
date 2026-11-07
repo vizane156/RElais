@@ -21,7 +21,11 @@ export const Header: React.FC = () => {
   return (
     <header className="bar">
       <div className="brand">
-        <Icon name="mark" className="ic mark" />
+        <img
+          src="/assets/relais_logo_relief_transparent.png"
+          alt="Relais"
+          className="brand-logo-relief"
+        />
         <span className="brand-name">Relais</span>
       </div>
 

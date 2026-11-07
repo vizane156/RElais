@@ -223,8 +223,8 @@ export const LibraryPanel: React.FC = () => {
               }
             }}
           >
-            {availableProfiles.map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
+            {availableProfiles.map((p, pIdx) => (
+              <option key={`clone-prof-${p.id || pIdx}-${pIdx}`} value={p.id}>{p.name}</option>
             ))}
           </select>
 
@@ -321,12 +321,12 @@ export const LibraryPanel: React.FC = () => {
         <p className="empty-note">{t('library.empty')}</p>
       ) : (
         <ul className="lib-list">
-          {recordings.map((rec) => {
+          {recordings.map((rec, recIdx) => {
             const side = rec.lang === sideLang('a') ? 'a' : 'b';
             const isPlaying = playingId === rec.id;
 
             return (
-              <li key={rec.id} className="lib-item">
+              <li key={`rec-${rec.id || recIdx}-${recIdx}`} className="lib-item">
                 <button
                   className="icon-btn"
                   type="button"

@@ -5,6 +5,7 @@ export interface MeetingSpeaker {
   name: string;
   color: string;
   initial: string;
+  avatarUrl?: string;
 }
 
 export interface MeetingUtterance {
@@ -59,21 +60,28 @@ export function formatTime(seconds: number): string {
 export const formatDuration = formatTime;
 
 export const DEFAULT_SPEAKERS: MeetingSpeaker[] = [
-  { id: 'spk-1', name: 'Vital (Moi)', color: '#2C3FD4', initial: 'V' },
-  { id: 'spk-2', name: 'Sarah (Chef de Projet)', color: '#E4580A', initial: 'S' },
-  { id: 'spk-3', name: 'Marc (Tech Lead)', color: '#0F9D58', initial: 'M' },
+  { id: 'spk-1', name: 'Vital (Moi)', color: '#2C3FD4', initial: 'V', avatarUrl: '/assets/avatar_vital.jpg' },
+  { id: 'spk-2', name: 'Sarah (Chef de Projet)', color: '#E4580A', initial: 'S', avatarUrl: '/assets/avatar_sarah.jpg' },
+  { id: 'spk-3', name: 'Marc (Tech Lead)', color: '#0F9D58', initial: 'M', avatarUrl: '/assets/avatar_marc.jpg' },
 ];
 
 const SPEAKER_PALETTE = ['#2C3FD4', '#E4580A', '#0F9D58', '#9C27B0', '#009688', '#E91E63', '#3F51B5'];
+export const AVATAR_POOL = [
+  '/assets/avatar_vital.jpg',
+  '/assets/avatar_sarah.jpg',
+  '/assets/avatar_marc.jpg',
+];
 
-export function createSpeaker(name: string, index: number): MeetingSpeaker {
+export function createSpeaker(name: string, index: number, customAvatar?: string): MeetingSpeaker {
   const color = SPEAKER_PALETTE[index % SPEAKER_PALETTE.length];
   const initial = name.trim().charAt(0).toUpperCase() || 'P';
+  const avatarUrl = customAvatar || AVATAR_POOL[index % AVATAR_POOL.length];
   return {
     id: `spk-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
     name: name.trim(),
     color,
     initial,
+    avatarUrl,
   };
 }
 
@@ -128,7 +136,21 @@ export class MeetingService {
   static getStoredSession(): MeetingSession {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.speakers && Array.isArray(parsed.speakers)) {
+          parsed.speakers = parsed.speakers.map((s: MeetingSpeaker, idx: number) => {
+            if (!s.avatarUrl) {
+              if (s.name.includes('Vital') || s.id === 'spk-1') s.avatarUrl = '/assets/avatar_vital.jpg';
+              else if (s.name.includes('Sarah') || s.id === 'spk-2') s.avatarUrl = '/assets/avatar_sarah.jpg';
+              else if (s.name.includes('Marc') || s.id === 'spk-3') s.avatarUrl = '/assets/avatar_marc.jpg';
+              else s.avatarUrl = AVATAR_POOL[idx % AVATAR_POOL.length];
+            }
+            return s;
+          });
+        }
+        return parsed;
+      }
     } catch {
       /* ignore */
     }

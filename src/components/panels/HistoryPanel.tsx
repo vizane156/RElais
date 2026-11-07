@@ -47,8 +47,8 @@ export const HistoryPanel: React.FC = () => {
         <p className="empty-note">{t('history.empty')}</p>
       ) : (
         <div>
-          {reversed.map((e) => (
-            <div key={e.id} className="hist-item">
+          {reversed.map((e, idx) => (
+            <div key={`hist-${e.id || idx}-${idx}`} className="hist-item">
               <time>
                 {new Date((e.ts || 0) * 1000).toLocaleString([], {
                   hour: '2-digit',

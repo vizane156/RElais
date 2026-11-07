@@ -8,8 +8,8 @@ export const Toasts: React.FC = () => {
 
   return (
     <div className="toasts" id="toasts">
-      {toasts.map((toast) => (
-        <div key={toast.id} className="toast" role="status">
+      {toasts.map((toast, idx) => (
+        <div key={`toast-${toast.id || idx}-${idx}`} className="toast" role="status">
           {toast.message}
         </div>
       ))}
